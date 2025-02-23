@@ -27,8 +27,11 @@ secure-file-manager/
 ├── files/
 │   ├── app/
 │   │   ├── config.py       # Configuration settings (MASTER_KEY_FILE, SECURE_DIR, etc.)
+
 │   │   └── data/          # Directory for storing encrypted files and logs
 │   └── main.py            # Main application logic
 │
 └── README.md              # This file
 ```
+![Screenshot 2025-02-23 175324](https://github.com/user-attachments/assets/1c5fb887-b63d-4a75-b9c1-d00577930d3a)
+![Screenshot 2025-02-23 175315](https://github.com/user-attachments/assets/cc3808b1-bd35-4efa-9b1a-c0de345cf5c7)
