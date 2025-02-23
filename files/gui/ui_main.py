@@ -25,7 +25,7 @@ passMinSize = 4  # Adjusted for example; original was 8
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("🔒 PySecureVault 🗝️")
+        self.setWindowTitle(config.SETTINGS["app"]["name"])
         self.setGeometry(100, 100, 700, 500)
         self.locked_items = AppFunctions.load_locked_items()
         self.item_path = None

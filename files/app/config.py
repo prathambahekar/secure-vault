@@ -10,7 +10,13 @@ if os.name == "nt":  # Windows: Make directory hidden
     os.system(f'attrib +h "{os.path.dirname(SECURE_DIR)}"')
 
 SETTINGS = {
-    "menu_bar_enabled" : False
+    "app" : {
+        "name" : "🔒 Secure Vault 🗝️",
+        "version" : "v0.0.5",
+        "build" : "dev"
+    },
+    "menu_bar_enabled" : False,
+    
 }
 
 # Centralized Style Configurations
