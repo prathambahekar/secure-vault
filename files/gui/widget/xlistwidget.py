@@ -34,12 +34,9 @@ class xListWidget(QWidget):
             QListWidget::item:selected {{
                 background-color: {theme['accent_color']};
                 color: {theme['selected_text_color']};
-                border-radius: 8px;
+                border-radius: 6px;
             }}
-            QListWidget::item:hover {{
-                background-color: {theme['hover_bg']};
-                color: {theme['text_color']};
-            }}
+            
         """)
 
     def update_theme(self, new_theme):
