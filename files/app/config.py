@@ -9,6 +9,10 @@ os.makedirs(SECURE_DIR, exist_ok=True)
 if os.name == "nt":  # Windows: Make directory hidden
     os.system(f'attrib +h "{os.path.dirname(SECURE_DIR)}"')
 
+SETTINGS = {
+    "menu_bar_enabled" : False
+}
+
 # Centralized Style Configurations
 STYLE_CONFIG_DARK = {
     "font_family": "Segoe UI Variable",

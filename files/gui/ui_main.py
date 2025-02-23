@@ -1,4 +1,3 @@
-# main_window.py
 from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QFileDialog, QLabel, QDialog, QMessageBox
 from PyQt6.QtCore import Qt
 import os
@@ -9,12 +8,10 @@ import base64, darkdetect
 from files.gui.modules import *
 from files.app.app_functions import *
 import files.app.config as config
-from files.gui.ui_components import DropArea, PasswordDialog
-from files.gui.widget.xbutton import xButton
-from files.gui.widget.xcombobox import xComboBox
-from files.gui.widget.xlabel import xLabel
-from files.gui.widget.xlistwidget import xListWidget
-from files.gui.widget.xscrollbar import xScrollBar
+from files.gui.ui_components import *
+
+
+  # Adjust the import path as needed
 
 key_file = config.MASTER_KEY_FILE
 locked_file = config.LOCKED_ITEMS_FILE
@@ -22,6 +19,7 @@ access_log = config.ACCESS_LOG_FILE
 secure_dir = config.SECURE_DIR
 theme_dark = config.STYLE_CONFIG_DARK
 theme_light = config.STYLE_CONFIG_LIGHT
+is_menubar = config.SETTINGS["menu_bar_enabled"]
 passMinSize = 4  # Adjusted for example; original was 8
 
 class MainWindow(QMainWindow):
@@ -43,6 +41,11 @@ class MainWindow(QMainWindow):
                 self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, False)
 
     def setup_ui(self):
+        # Set up the menu bar
+        if is_menubar:
+            self.menu_bar = xMenuBar(self.current_theme, self)
+            self.setMenuBar(self.menu_bar)
+
         central_widget = QWidget(self)
         self.setCentralWidget(central_widget)
         layout = QVBoxLayout(central_widget)
@@ -120,6 +123,10 @@ class MainWindow(QMainWindow):
             f"font: {theme['font_size_medium']} \"{theme['font_family']}\"; color: {theme['text_color']};"
         )
         self.setStyleSheet(f"background-color: {theme['bg_color']};")
+
+        # Update the menu bar theme
+        if is_menubar:
+            self.menu_bar.update_theme(theme)
 
     def toggle_theme(self):
         self.current_theme = theme_light if self.current_theme == theme_dark else theme_dark
