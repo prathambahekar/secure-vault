@@ -46,11 +46,21 @@ class MainWindow(QMainWindow):
             self.menu_bar = xMenuBar(self.current_theme, self)
             self.setMenuBar(self.menu_bar)
 
-        central_widget = QWidget(self)
-        self.setCentralWidget(central_widget)
-        layout = QVBoxLayout(central_widget)
-        layout.setContentsMargins(20, 20, 20, 20)
-        layout.setSpacing(15)
+        # Container for horizontal layout
+        container = QWidget()
+        main_layout = QHBoxLayout(container)
+        main_layout.setSpacing(10)
+
+        # Add Sidebar
+        self.sidebar = xSidebar(self, self.current_theme)
+        self.sidebar.setFixedWidth(50)  # Fixed width for sidebar
+        main_layout.addWidget(self.sidebar)
+
+        # Central widget for main content
+        self.central_widget = QWidget()
+        central_layout = QVBoxLayout(self.central_widget)
+        central_layout.setContentsMargins(20, 20, 20, 20)
+        central_layout.setSpacing(15)
 
         # Top bar with title and theme toggle
         top_bar = QHBoxLayout()
@@ -62,16 +72,16 @@ class MainWindow(QMainWindow):
         self.theme_toggle.setFixedWidth(100)
         self.theme_toggle.clicked.connect(self.toggle_theme)
         top_bar.addWidget(self.theme_toggle)
-        layout.addLayout(top_bar)
+        central_layout.addLayout(top_bar)
 
         self.drop_area = DropArea(self, self.current_theme)
         self.drop_area.mousePressEvent = lambda event: self.select_item()
-        layout.addWidget(self.drop_area, stretch=1)
+        central_layout.addWidget(self.drop_area, stretch=1)
 
         self.list_widget = xListWidget(self.current_theme, self)
         self.list_widget.list_widget.setVerticalScrollBar(xScrollBar(self.current_theme, self))
         self.update_list()
-        layout.addWidget(self.list_widget, stretch=2)
+        central_layout.addWidget(self.list_widget, stretch=2)
 
         category_layout = QHBoxLayout()
         category_label = QLabel("Filter by Category:", self)
@@ -80,7 +90,7 @@ class MainWindow(QMainWindow):
         self.category_combo.addItems(["All", "Personal", "Work", "Other"])
         self.category_combo.currentTextChanged.connect(self.filter_items)
         category_layout.addWidget(self.category_combo)
-        layout.addLayout(category_layout)
+        central_layout.addLayout(category_layout)
 
         action_layout = QHBoxLayout()
         action_layout.setSpacing(10)
@@ -102,7 +112,11 @@ class MainWindow(QMainWindow):
         action_layout.addWidget(self.delete_btn)
 
         action_layout.addStretch()
-        layout.addLayout(action_layout)
+        central_layout.addLayout(action_layout)
+
+        # Add central_widget to main_layout and set container as central widget
+        main_layout.addWidget(self.central_widget)
+        self.setCentralWidget(container)
 
         self.apply_theme()
 
@@ -119,10 +133,15 @@ class MainWindow(QMainWindow):
         self.lock_btn.update_theme(theme)
         self.unlock_btn.update_theme(theme)
         self.delete_btn.update_theme(theme)
-        self.centralWidget().layout().itemAt(3).layout().itemAt(0).widget().setStyleSheet(
+        self.central_widget.layout().itemAt(3).layout().itemAt(0).widget().setStyleSheet(
             f"font: {theme['font_size_medium']} \"{theme['font_family']}\"; color: {theme['text_color']};"
         )
         self.setStyleSheet(f"background-color: {theme['bg_color']};")
+
+        self.central_widget.setStyleSheet(f"""
+        background-color: {theme['def_bg']};
+        border-radius: 5px;
+        """)
 
         # Update the menu bar theme
         if is_menubar:

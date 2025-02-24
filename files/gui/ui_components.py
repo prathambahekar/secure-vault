@@ -6,3 +6,4 @@ from files.gui.widget.xlabel import xLabel
 from files.gui.widget.xlistwidget import xListWidget
 from files.gui.widget.xscrollbar import xScrollBar
 from files.gui.widget.xmenubar import xMenuBar
+from files.gui.widget.xsidebar import xSidebar
