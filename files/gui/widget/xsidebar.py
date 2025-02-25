@@ -76,7 +76,7 @@ class SidebarButton(QPushButton):
 class xSidebar(QFrame):
     """
     A collapsible sidebar with dynamically added buttons using SVG icons.
-    Supports theming based on dark/light mode.
+    Supports theming based on dark/light mode and top/bottom button placement.
     """
     def __init__(self, parent=None, theme=None):
         """
@@ -101,6 +101,8 @@ class xSidebar(QFrame):
         """Update theme colors based on dark/light mode."""
         self.theme['bg_color'] = config.STYLE_CONFIG_DARK["bg_color"] if darkdetect.isDark() else config.STYLE_CONFIG_LIGHT["bg_color"]
         self.theme['text_color'] = config.STYLE_CONFIG_DARK["selected_text_color"] if darkdetect.isDark() else config.STYLE_CONFIG_LIGHT["selected_text_color"]
+        # Optional: Define separator color in theme
+        self.theme['separator_color'] = '#555555' if darkdetect.isDark() else '#cccccc'
 
     def setup_ui(self):
         """Set up the sidebar's UI with a toggle button and dynamic buttons."""
@@ -110,25 +112,27 @@ class xSidebar(QFrame):
 
         # Create toggle button
         self.toggle_btn = SidebarButton(
-            icon=QIcon("files\gui\icons\menu.svg"),           # Placeholder for hamburger icon
-            expanded_icon=QIcon("files\gui\icons\menu.svg"), # Placeholder for close icon
+            icon=QIcon("files\\gui\\icons\\menu.svg"),           # Placeholder for hamburger icon
+            expanded_icon=QIcon("files\\gui\\icons\\menu.svg"), # Placeholder for close icon
             is_toggle=True,
             theme=self.theme,
             parent=self
         )
         self.toggle_btn.setFixedHeight(50)
-        self.layout.addWidget(self.toggle_btn)
 
-        # Define button configurations
+        # Define button configurations with position option
         self.button_configs = [
-            {"name": "home", "icon": QIcon("files\gui\icons\home.svg"), "full_text": "Home"},
-            {"name": "settings", "icon": QIcon("files\gui\icons\settings.svg"), "full_text": "Settings"},
-            # Add more buttons here, e.g.,
-            # {"name": "about", "icon": QIcon("path/to/about.svg"), "full_text": "About"},
+            {"name": "home", "icon": QIcon("files\\gui\\icons\\home.svg"), "full_text": "Home", "position": "top"},
+            {"name": "settings", "icon": QIcon("files\\gui\\icons\\settings.svg"), "full_text": "Settings", "position": "bottom"},
+            # Add more buttons as needed, e.g.,
+            # {"name": "about", "icon": QIcon("files\\gui\\icons\\about.svg"), "full_text": "About", "position": "top"},
         ]
 
         # Create and store buttons dynamically
         self.buttons = {}
+        top_buttons = []
+        bottom_buttons = []
+
         for config in self.button_configs:
             btn = SidebarButton(
                 icon=config["icon"],
@@ -137,11 +141,28 @@ class xSidebar(QFrame):
                 parent=self
             )
             btn.setFixedHeight(50)
-            self.layout.addWidget(btn)
             self.buttons[config["name"]] = btn
+            if config.get("position", "top") == "top":
+                top_buttons.append(btn)
+            else:
+                bottom_buttons.append(btn)
 
-        # Add stretch to align buttons at the top
-        self.layout.addStretch()
+        # Add widgets to the layout
+        self.layout.addWidget(self.toggle_btn)
+        for btn in top_buttons:
+            self.layout.addWidget(btn)
+        self.layout.addStretch()  # Push bottom content down
+
+        if bottom_buttons:
+            # # Create and add separator
+            # self.separator = QFrame()
+            # self.separator.setFrameShape(QFrame.Shape.HLine)  # Fixed previously
+            # self.separator.setFrameShadow(QFrame.Shadow.Sunken)  # Fixed: Use QFrame.Shadow.Sunken
+            # self.separator.setFixedHeight(1)
+            # self.layout.addWidget(self.separator)
+            # Add bottom buttons
+            for btn in bottom_buttons:
+                self.layout.addWidget(btn)
 
         # Connect toggle button
         self.toggle_btn.clicked.connect(self.toggle_sidebar)
@@ -157,6 +178,8 @@ class xSidebar(QFrame):
         """)
         for btn in [self.toggle_btn] + list(self.buttons.values()):
             btn.update_theme(self.theme)
+        if hasattr(self, 'separator') and self.separator:
+            self.separator.setStyleSheet(f"background-color: {self.theme.get('separator_color', '#cccccc')};")
 
     def toggle_sidebar(self):
         """Toggle the sidebar between collapsed and expanded states."""
@@ -179,3 +202,13 @@ class xSidebar(QFrame):
         # Start animation and update state
         self.animation.start()
         self.is_expanded = expanded
+
+# Example usage (optional, for testing):
+# if __name__ == "__main__":
+#     app = QApplication([])
+#     window = QMainWindow()
+#     sidebar = xSidebar(window)
+#     window.setCentralWidget(QWidget())  # Placeholder central widget
+#     window.resize(800, 600)
+#     sidebar.show()
+#     app.exec()
