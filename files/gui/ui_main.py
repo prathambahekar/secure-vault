@@ -1,17 +1,15 @@
-from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QFileDialog, QLabel, QDialog, QMessageBox
+from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QFileDialog, QLabel, QDialog, QMessageBox, QStackedWidget
 from PyQt6.QtCore import Qt
 import os
 import shutil
 import uuid
 import hashlib
-import base64, darkdetect
+import base64
+import darkdetect
 from files.gui.modules import *
 from files.app.app_functions import *
 import files.app.config as config
 from files.gui.ui_components import *
-
-
-  # Adjust the import path as needed
 
 key_file = config.MASTER_KEY_FILE
 locked_file = config.LOCKED_ITEMS_FILE
@@ -58,11 +56,32 @@ class MainWindow(QMainWindow):
         self.sidebar.setFixedWidth(50)  # Fixed width for sidebar
         main_layout.addWidget(self.sidebar)
 
-        # Central widget for main content
-        self.central_widget = QWidget()
-        central_layout = QVBoxLayout(self.central_widget)
+        # Stacked widget for switching pages
+        self.stack_widget = QStackedWidget()
+        main_layout.addWidget(self.stack_widget)
+
+        # Home Page
+        self.home_page = self.create_home_page()
+        self.stack_widget.addWidget(self.home_page)
+
+        # Settings Page
+        self.settings_page = self.create_settings_page()
+        self.stack_widget.addWidget(self.settings_page)
+
+        # Connect sidebar buttons to switch pages
+        self.sidebar.buttons["home"].clicked.connect(self.show_home_page)
+        self.sidebar.buttons["settings"].clicked.connect(self.show_settings_page)
+
+        # Set container as central widget
+        self.setCentralWidget(container)
+        self.apply_theme()
+
+    def create_home_page(self):
+        # Central widget for home page content
+        home_widget = QWidget()
+        central_layout = QVBoxLayout(home_widget)
         central_layout.setContentsMargins(20, 20, 20, 20)
-        central_layout.setSpacing(15)
+        central_layout.setSpacing(10)
 
         # Top bar with title and theme toggle
         top_bar = QHBoxLayout()
@@ -116,25 +135,33 @@ class MainWindow(QMainWindow):
         action_layout.addStretch()
         central_layout.addLayout(action_layout)
 
-        # Add central_widget to main_layout and set container as central widget
-        main_layout.addWidget(self.central_widget)
-        self.setCentralWidget(container)
+        return home_widget
 
-        def home_slot():
-            print("Home clicked")
-        def settings_slot():
-            print("Settings clicked")
+    def create_settings_page(self):
+        # Simple settings page for demonstration
+        settings_widget = QWidget()
+        settings_layout = QVBoxLayout(settings_widget)
+        settings_layout.setContentsMargins(20, 20, 20, 20)
 
-        self.sidebar.buttons["home"].clicked.connect(home_slot)
-        self.sidebar.buttons["settings"].clicked.connect(settings_slot)
+        settings_label = xLabel("Settings", self.current_theme, self)
+        settings_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        settings_layout.addWidget(settings_label)
 
-        self.apply_theme()
+        # Add some example settings (e.g., a placeholder label)
+        placeholder = xLabel("Settings content goes here", self.current_theme, self)
+        settings_layout.addWidget(placeholder)
+        settings_layout.addStretch()
 
-    def home_slot():
-        print("Home clicked")
-    def settings_slot():
-        print("Settings clicked")
-        
+        return settings_widget
+
+    def show_home_page(self):
+        self.stack_widget.setCurrentWidget(self.home_page)
+        print("Home page displayed")
+
+    def show_settings_page(self):
+        self.stack_widget.setCurrentWidget(self.settings_page)
+        print("Settings page displayed")
+
     def apply_theme(self):
         theme = self.current_theme
         self.drop_area.apply_theme(theme)
@@ -142,24 +169,17 @@ class MainWindow(QMainWindow):
         self.list_widget.list_widget.verticalScrollBar().update_theme(theme)
         self.category_combo.update_theme(theme)
         self.title_label.update_theme(theme)
-        # Update all xButton instances
         self.theme_toggle.update_theme(theme)
         self.open_btn.update_theme(theme)
         self.lock_btn.update_theme(theme)
         self.unlock_btn.update_theme(theme)
         self.delete_btn.update_theme(theme)
-        self.central_widget.layout().itemAt(3).layout().itemAt(0).widget().setStyleSheet(
+        self.home_page.layout().itemAt(3).layout().itemAt(0).widget().setStyleSheet(
             f"font: {theme['font_size_medium']} \"{theme['font_family']}\"; color: {theme['text_color']};"
-            
         )
         self.setStyleSheet(f"background-color: {theme['bg_color']};")
-
-        self.central_widget.setStyleSheet(f"""
-        background-color: {theme['def_bg']};
-        border-radius: 5px;
-        """)
-
-        # Update the menu bar theme
+        self.home_page.setStyleSheet(f"background-color: {theme['def_bg']}; border-radius: 5px;")
+        self.settings_page.setStyleSheet(f"background-color: {theme['def_bg']}; border-radius: 5px;")
         if is_menubar:
             self.menu_bar.update_theme(theme)
 
@@ -176,6 +196,8 @@ class MainWindow(QMainWindow):
                 )
             except Exception as e:
                 print(f"Failed to update Mica theme: {e}")
+
+    # Remaining methods (select_item, lock_item, unlock_item, delete_item, update_list, filter_items) remain unchanged
 
     def select_item(self):
         item_path, _ = QFileDialog.getOpenFileName(self, "Select File or Folder", "", "All Files (*)")
