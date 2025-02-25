@@ -91,7 +91,7 @@ class xSidebar(QFrame):
         self.update_theme_colors()
         self.is_expanded = False
         self.min_width = 50
-        self.max_width = 200
+        self.max_width = 250
         self.setMinimumWidth(self.min_width)
         self.setMaximumWidth(self.max_width)
         self.setup_ui()

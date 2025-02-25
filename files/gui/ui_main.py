@@ -1,17 +1,18 @@
-from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QFileDialog, QLabel, QDialog, QMessageBox
+# main.py
+from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QStackedWidget
 from PyQt6.QtCore import Qt
 import os
 import shutil
 import uuid
 import hashlib
-import base64, darkdetect
+import base64
+import darkdetect
 from files.gui.modules import *
 from files.app.app_functions import *
 import files.app.config as config
 from files.gui.ui_components import *
-
-
-  # Adjust the import path as needed
+from files.gui.pages.home import HomePage
+from files.gui.pages.settings import SettingsPage
 
 key_file = config.MASTER_KEY_FILE
 locked_file = config.LOCKED_ITEMS_FILE
@@ -21,7 +22,7 @@ theme_dark = config.STYLE_CONFIG_DARK
 theme_light = config.STYLE_CONFIG_LIGHT
 is_menubar = config.SETTINGS["menu_bar_enabled"]
 is_mica = config.SETTINGS["is_mica"]
-passMinSize = 4  # Adjusted for example; original was 8
+passMinSize = 4
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -29,7 +30,6 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(config.SETTINGS["app"]["name"])
         self.setGeometry(100, 100, 700, 500)
         self.locked_items = AppFunctions.load_locked_items()
-        self.item_path = None
         self.current_theme = theme_dark if darkdetect.isDark() else theme_light
         self.setup_ui()
 
@@ -43,129 +43,50 @@ class MainWindow(QMainWindow):
                 self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, False)
 
     def setup_ui(self):
-        # Set up the menu bar
         if is_menubar:
             self.menu_bar = xMenuBar(self.current_theme, self)
             self.setMenuBar(self.menu_bar)
 
-        # Container for horizontal layout
         container = QWidget()
         main_layout = QHBoxLayout(container)
         main_layout.setSpacing(10)
 
-        # Add Sidebar
         self.sidebar = xSidebar(self, self.current_theme)
-        self.sidebar.setFixedWidth(50)  # Fixed width for sidebar
+        self.sidebar.setFixedWidth(50)
         main_layout.addWidget(self.sidebar)
 
-        # Central widget for main content
-        self.central_widget = QWidget()
-        central_layout = QVBoxLayout(self.central_widget)
-        central_layout.setContentsMargins(20, 20, 20, 20)
-        central_layout.setSpacing(15)
+        self.stack_widget = QStackedWidget()
+        self.home_page = HomePage(self, self.current_theme)
+        self.settings_page = SettingsPage(self, self.current_theme)
+        self.stack_widget.addWidget(self.home_page)
+        self.stack_widget.addWidget(self.settings_page)
 
-        # Top bar with title and theme toggle
-        top_bar = QHBoxLayout()
-        self.title_label = xLabel("🔒 Secure Vault 🔑", self.current_theme, self)
-        self.title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        top_bar.addWidget(self.title_label)
-        top_bar.addStretch()
-        self.theme_toggle = xButton("Light", self.current_theme, self)
-        self.theme_toggle.setFixedWidth(100)
-        self.theme_toggle.clicked.connect(self.toggle_theme)
-        top_bar.addWidget(self.theme_toggle)
-        central_layout.addLayout(top_bar)
+        self.sidebar.buttons["home"].clicked.connect(self.show_home_page)
+        self.sidebar.buttons["settings"].clicked.connect(self.show_settings_page)
 
-        self.drop_area = DropArea(self, self.current_theme)
-        self.drop_area.mousePressEvent = lambda event: self.select_item()
-        central_layout.addWidget(self.drop_area, stretch=1)
-
-        self.list_widget = xListWidget(self.current_theme, self)
-        self.list_widget.list_widget.setVerticalScrollBar(xScrollBar(self.current_theme, self))
-        self.update_list()
-        central_layout.addWidget(self.list_widget, stretch=2)
-
-        category_layout = QHBoxLayout()
-        category_label = QLabel("Filter by Category:", self)
-        category_layout.addWidget(category_label)
-        self.category_combo = xComboBox(self.current_theme, self)
-        self.category_combo.addItems(["All", "Personal", "Work", "Other"])
-        self.category_combo.currentTextChanged.connect(self.filter_items)
-        category_layout.addWidget(self.category_combo)
-        central_layout.addLayout(category_layout)
-
-        action_layout = QHBoxLayout()
-        action_layout.setSpacing(10)
-
-        self.open_btn = xButton("Open Folder", self.current_theme, self)
-        self.open_btn.clicked.connect(self.select_item)
-        action_layout.addWidget(self.open_btn)
-
-        self.lock_btn = xButton("Lock Folder", self.current_theme, self)
-        self.lock_btn.clicked.connect(self.lock_item)
-        action_layout.addWidget(self.lock_btn)
-
-        self.unlock_btn = xButton("Unlock Folder", self.current_theme, self)
-        self.unlock_btn.clicked.connect(self.unlock_item)
-        action_layout.addWidget(self.unlock_btn)
-
-        self.delete_btn = xButton("Secure Delete", self.current_theme, self)
-        self.delete_btn.clicked.connect(self.delete_item)
-        action_layout.addWidget(self.delete_btn)
-
-        action_layout.addStretch()
-        central_layout.addLayout(action_layout)
-
-        # Add central_widget to main_layout and set container as central widget
-        main_layout.addWidget(self.central_widget)
+        main_layout.addWidget(self.stack_widget)
         self.setCentralWidget(container)
-
-        def home_slot():
-            print("Home clicked")
-        def settings_slot():
-            print("Settings clicked")
-
-        self.sidebar.buttons["home"].clicked.connect(home_slot)
-        self.sidebar.buttons["settings"].clicked.connect(settings_slot)
-
         self.apply_theme()
 
-    def home_slot():
-        print("Home clicked")
-    def settings_slot():
-        print("Settings clicked")
-        
+    def show_home_page(self):
+        self.stack_widget.setCurrentWidget(self.home_page)
+        print("Home page displayed")
+
+    def show_settings_page(self):
+        self.stack_widget.setCurrentWidget(self.settings_page)
+        print("Settings page displayed")
+
     def apply_theme(self):
-        theme = self.current_theme
-        self.drop_area.apply_theme(theme)
-        self.list_widget.update_theme(theme)
-        self.list_widget.list_widget.verticalScrollBar().update_theme(theme)
-        self.category_combo.update_theme(theme)
-        self.title_label.update_theme(theme)
-        # Update all xButton instances
-        self.theme_toggle.update_theme(theme)
-        self.open_btn.update_theme(theme)
-        self.lock_btn.update_theme(theme)
-        self.unlock_btn.update_theme(theme)
-        self.delete_btn.update_theme(theme)
-        self.central_widget.layout().itemAt(3).layout().itemAt(0).widget().setStyleSheet(
-            f"font: {theme['font_size_medium']} \"{theme['font_family']}\"; color: {theme['text_color']};"
-            
-        )
-        self.setStyleSheet(f"background-color: {theme['bg_color']};")
-
-        self.central_widget.setStyleSheet(f"""
-        background-color: {theme['def_bg']};
-        border-radius: 5px;
-        """)
-
-        # Update the menu bar theme
+        self.current_theme = theme_light if self.current_theme == theme_dark else theme_dark
+        self.home_page.apply_theme(self.current_theme)
+        self.settings_page.apply_theme(self.current_theme)
+        self.setStyleSheet(f"background-color: {self.current_theme['bg_color']};")
         if is_menubar:
-            self.menu_bar.update_theme(theme)
+            self.menu_bar.update_theme(self.current_theme)
 
     def toggle_theme(self):
         self.current_theme = theme_light if self.current_theme == theme_dark else theme_dark
-        self.theme_toggle.setText("Dark" if self.current_theme == theme_light else "Light")
+        self.home_page.theme_toggle.setText("Dark" if self.current_theme == theme_light else "Light")
         self.apply_theme()
         if os.name == "nt":
             try:
@@ -177,18 +98,10 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 print(f"Failed to update Mica theme: {e}")
 
-    def select_item(self):
-        item_path, _ = QFileDialog.getOpenFileName(self, "Select File or Folder", "", "All Files (*)")
-        if not item_path:
-            item_path = QFileDialog.getExistingDirectory(self, "Select Folder")
-        if item_path:
-            self.item_path = item_path
-            self.drop_area.setText(f"Selected: {os.path.basename(item_path)}")
-
-    def lock_item(self):
-        if not self.item_path:
+    def lock_item(self, page):
+        if not page.item_path:
             AppFunctions.show_message(self, "Please select an item!", "Error", self.current_theme)
-            self.drop_area.setText("Drag and Drop Files or Folders Here\nor Click to Select")
+            page.drop_area.setText("Drag and Drop Files or Folders Here\nor Click to Select")
             return
         dialog = PasswordDialog("Set Password", "Enter password for item:", self, self.current_theme)
         if dialog.exec() == QDialog.DialogCode.Accepted:
@@ -197,28 +110,28 @@ class MainWindow(QMainWindow):
                 AppFunctions.show_message(self, f"Password must be {passMinSize}+ characters!", "Error", self.current_theme)
                 return
             try:
-                salt = AppFunctions.encrypt_items(self.item_path, password)
+                salt = AppFunctions.encrypt_items(page.item_path, password)
                 secure_path = os.path.join(secure_dir, str(uuid.uuid4()))
-                shutil.move(self.item_path, secure_path)
+                shutil.move(page.item_path, secure_path)
                 item_hash = hashlib.sha256(password.encode()).hexdigest()
-                self.locked_items[os.path.basename(self.item_path)] = {
-                    "original_path": self.item_path,
+                self.locked_items[os.path.basename(page.item_path)] = {
+                    "original_path": page.item_path,
                     "secure_path": secure_path,
                     "salt": base64.b64encode(salt).decode(),
                     "hash": item_hash,
-                    "category": self.category_combo.currentText() if self.category_combo.currentText() != "All" else "Uncategorized"
+                    "category": page.category_combo.currentText() if page.category_combo.currentText() != "All" else "Uncategorized"
                 }
                 AppFunctions.save_locked_items(self.locked_items)
-                AppFunctions.log_action(f"Locked item: {self.item_path}")
+                AppFunctions.log_action(f"Locked item: {page.item_path}")
                 AppFunctions.show_message(self, "Item locked successfully!", "Success", self.current_theme)
-                self.update_list()
-                self.item_path = None
-                self.drop_area.setText("Drag and Drop Files or Folders Here\nor Click to Select")
+                page.update_list()
+                page.item_path = None
+                page.drop_area.setText("Drag and Drop Files or Folders Here\nor Click to Select")
             except Exception as e:
                 AppFunctions.show_message(self, f"Error locking item: {str(e)}", "Error", self.current_theme)
 
-    def unlock_item(self):
-        selected = self.list_widget.current_item()
+    def unlock_item(self, page):
+        selected = page.list_widget.current_item()
         if not selected:
             AppFunctions.show_message(self, "Please select an item to unlock!", "Error", self.current_theme)
             return
@@ -245,12 +158,12 @@ class MainWindow(QMainWindow):
                 AppFunctions.save_locked_items(self.locked_items)
                 AppFunctions.log_action(f"Unlocked item: {item_name}")
                 AppFunctions.show_message(self, "Item unlocked successfully!", "Success", self.current_theme)
-                self.update_list()
+                page.update_list()
             except Exception as e:
                 AppFunctions.show_message(self, f"Error unlocking item: {str(e)}", "Error", self.current_theme)
 
-    def delete_item(self):
-        selected = self.list_widget.current_item()
+    def delete_item(self, page):
+        selected = page.list_widget.current_item()
         if not selected:
             AppFunctions.show_message(self, "Please select an item to delete!", "Error", self.current_theme)
             return
@@ -273,20 +186,17 @@ class MainWindow(QMainWindow):
                         AppFunctions.save_locked_items(self.locked_items)
                         AppFunctions.log_action(f"Deleted item: {item_name}")
                         AppFunctions.show_message(self, "Item deleted successfully!", "Success", self.current_theme)
-                        self.update_list()
+                        page.update_list()
                     except Exception as e:
                         AppFunctions.show_message(self, f"Error deleting item: {str(e)}", "Error", self.current_theme)
                 else:
                     AppFunctions.show_message(self, "Incorrect password!", "Error", self.current_theme)
                     AppFunctions.log_action(f"Failed delete attempt: {item_name}")
 
-    def update_list(self):
-        self.list_widget.clear()
-        for name, data in self.locked_items.items():
-            self.list_widget.add_item(f"{name} ({data['category']})")
-
-    def filter_items(self, category):
-        self.list_widget.clear()
-        for name, data in self.locked_items.items():
-            if category == "All" or data["category"] == category:
-                self.list_widget.add_item(f"{name} ({data['category']})")
+if __name__ == "__main__":
+    from PyQt6.QtWidgets import QApplication
+    import sys
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())
