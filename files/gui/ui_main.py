@@ -20,6 +20,7 @@ secure_dir = config.SECURE_DIR
 theme_dark = config.STYLE_CONFIG_DARK
 theme_light = config.STYLE_CONFIG_LIGHT
 is_menubar = config.SETTINGS["menu_bar_enabled"]
+is_mica = config.SETTINGS["is_mica"]
 passMinSize = 4  # Adjusted for example; original was 8
 
 class MainWindow(QMainWindow):
@@ -34,8 +35,9 @@ class MainWindow(QMainWindow):
 
         if os.name == "nt":
             try:
-                self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
-                ApplyMica(self.winId(), MicaTheme.AUTO, MicaStyle.DEFAULT)
+                if is_mica:
+                    self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+                    ApplyMica(self.winId(), MicaTheme.AUTO, MicaStyle.DEFAULT)
             except Exception as e:
                 print(f"Failed to apply Mica effect: {e}")
                 self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, False)
@@ -118,8 +120,21 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(self.central_widget)
         self.setCentralWidget(container)
 
+        def home_slot():
+            print("Home clicked")
+        def settings_slot():
+            print("Settings clicked")
+
+        self.sidebar.buttons["home"].clicked.connect(home_slot)
+        self.sidebar.buttons["settings"].clicked.connect(settings_slot)
+
         self.apply_theme()
 
+    def home_slot():
+        print("Home clicked")
+    def settings_slot():
+        print("Settings clicked")
+        
     def apply_theme(self):
         theme = self.current_theme
         self.drop_area.apply_theme(theme)
@@ -135,6 +150,7 @@ class MainWindow(QMainWindow):
         self.delete_btn.update_theme(theme)
         self.central_widget.layout().itemAt(3).layout().itemAt(0).widget().setStyleSheet(
             f"font: {theme['font_size_medium']} \"{theme['font_family']}\"; color: {theme['text_color']};"
+            
         )
         self.setStyleSheet(f"background-color: {theme['bg_color']};")
 

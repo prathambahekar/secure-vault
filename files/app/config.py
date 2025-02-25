@@ -16,6 +16,7 @@ SETTINGS = {
         "build" : "dev"
     },
     "menu_bar_enabled" : False,
+    "is_mica" : True
     
 }
 
@@ -28,7 +29,7 @@ STYLE_CONFIG_DARK = {
     "text_color": "#e0e0e0",
     "bg_color": "transparent",
     "secondary_bg": "#252525",
-    "def_bg": "#17191a",
+    "def_bg": "#2c2c2c",
     "border_color": "#3a3a3a",
     "accent_color": "#c8b7e1",
     "accent_hover": "#b9a6d3",
@@ -46,7 +47,7 @@ STYLE_CONFIG_LIGHT = {
     "text_color": "#333333",
     "bg_color": "transparent",
     "secondary_bg": "#ffffff",
-    "def_bg": "#252525",
+    "def_bg": "#ffffff",
     "border_color": "#d0d0d0",
     "accent_color": "#185abd",
     "accent_hover": "#185abd",
