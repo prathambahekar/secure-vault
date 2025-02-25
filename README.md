@@ -33,5 +33,5 @@ secure-file-manager/
 │
 └── README.md              # This file
 ```
-![Screenshot 2025-02-23 175324](https://github.com/user-attachments/assets/1c5fb887-b63d-4a75-b9c1-d00577930d3a)
-![Screenshot 2025-02-23 175315](https://github.com/user-attachments/assets/cc3808b1-bd35-4efa-9b1a-c0de345cf5c7)
+![image](https://github.com/user-attachments/assets/edadb7bb-d86d-4cd3-84c7-8544785e1093)
+
