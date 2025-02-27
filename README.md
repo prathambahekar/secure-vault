@@ -21,17 +21,38 @@ Install dependencies via pip:
 ```bash
 pip install PyQt6 cryptography darkdetect
 ```
-```bash
-secure-file-manager/
-│
-├── files/
-│   ├── app/
-│   │   ├── config.py       # Configuration settings (MASTER_KEY_FILE, SECURE_DIR, etc.)
 
-│   │   └── data/          # Directory for storing encrypted files and logs
-│   └── main.py            # Main application logic
-│
-└── README.md              # This file
+```bash
+SECURE-VAULT-MAIN
+├── files
+│   ├── app
+│   │   ├── app_functions.py
+│   │   └── config.py
+│   ├── gui
+│   │   ├── icons
+│   │   │   ├── home.svg
+│   │   │   ├── menu.svg
+│   │   │   └── settings.svg
+│   │   ├── pages
+│   │   │   ├── home.py
+│   │   │   └── settings.py
+│   │   ├── modules.py
+│   │   ├── ui_components.py
+│   │   ├── ui_main.py
+│   │   └── widget
+│   │       ├── xbutton.py
+│   │       ├── xcombobox.py
+│   │       ├── xdrop_area.py
+│   │       ├── xlabel.py
+│   │       ├── xlistwidget.py
+│   │       ├── xmenubar.py
+│   │       ├── xpass_dialog.py
+│   │       ├── xscrollbar.py
+│   │       └── xsidebar.py
+├── main.py
+└── README.md
 ```
+
+
 ![image](https://github.com/user-attachments/assets/edadb7bb-d86d-4cd3-84c7-8544785e1093)
 
