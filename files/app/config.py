@@ -11,14 +11,17 @@ if os.name == "nt":  # Windows: Make directory hidden
 
 SETTINGS = {
     "app" : {
-        "name" : "🔒 Secure Vault 🗝️",
+        "name" : "🔒 Secure Vault 1234🗝️",
         "version" : "v0.0.5",
         "build" : "dev"
     },
-    "menu_bar_enabled" : False,
+    "theme" : "default",
+    "menu_bar_enabled" : True,
     "is_mica" : True
     
 }
+
+# thene
 
 # Centralized Style Configurations
 STYLE_CONFIG_DARK = {

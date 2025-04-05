@@ -38,10 +38,10 @@ class xMenuBar(QMenuBar):
         """Apply the theme-based stylesheet for the menu bar and its components."""
         self.setStyleSheet(f"""
             QMenuBar {{
-                background-color: {self.theme['bg_color']};
+                background-color: transparent;
                 color: {self.theme['text_color']};
                 font: {self.theme['font_size_medium']} "{self.theme['font_family']}";
-                padding: 5px 0;
+                padding: 5px;
                 border: none;
             }}
             QMenuBar::item {{
@@ -51,14 +51,14 @@ class xMenuBar(QMenuBar):
                 border-radius: 3px;
             }}
             QMenuBar::item:selected, QMenuBar::item:hover {{
-                background-color: {self.theme['accent_hover']};
-                color: {self.theme['selected_text_color']};
+                background-color: {self.theme['def_bg']};
+                color: {self.theme['text_color']};
             }}
             QMenu {{
-                background-color: {self.theme['bg_color']};
+                background-color: {self.theme['secondary_bg']};
                 color: {self.theme['text_color']};
                 font: {self.theme['font_size_medium']} "{self.theme['font_family']}";
-                border: 1px solid {self.theme['accent_color']};
+                border: 2px solid {self.theme['def_bg']};
                 padding: 5px;
                 border-radius: 3px;
             }}

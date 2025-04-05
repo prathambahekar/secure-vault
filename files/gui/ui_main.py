@@ -20,6 +20,7 @@ access_log = config.ACCESS_LOG_FILE
 secure_dir = config.SECURE_DIR
 theme_dark = config.STYLE_CONFIG_DARK
 theme_light = config.STYLE_CONFIG_LIGHT
+config_theme = config.SETTINGS["theme"]
 is_menubar = config.SETTINGS["menu_bar_enabled"]
 is_mica = config.SETTINGS["is_mica"]
 passMinSize = 4
@@ -30,7 +31,31 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(config.SETTINGS["app"]["name"])
         self.setGeometry(100, 100, 700, 500)
         self.locked_items = AppFunctions.load_locked_items()
-        self.current_theme = theme_dark if darkdetect.isDark() else theme_light
+        
+        if config_theme == "default":
+            self.current_theme = theme_dark if darkdetect.isDark() else theme_light
+        
+            # print(config_theme)
+        elif config_theme == "dark":
+            self.current_theme = theme_dark
+            # try:
+            #     if is_mica:
+            #         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+            #         ApplyMica(self.winId(), MicaTheme.AUTO, MicaStyle.)
+            # except Exception as e:
+            #     print(f"Failed to apply Mica effect: {e}")
+            #     self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, False)
+
+        else:
+            self.current_theme = theme_light
+            # try:
+            #     if is_mica:
+            #         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+            #         ApplyMica(self.winId(), MicaTheme.AUTO, MicaStyle.LIGHT)
+            # except Exception as e:
+            #     print(f"Failed to apply Mica effect: {e}")
+            #     self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, False)
+            
         self.setup_ui()
 
         if os.name == "nt":
@@ -77,8 +102,16 @@ class MainWindow(QMainWindow):
         print("Settings page displayed")
 
     def apply_theme(self):
-        self.current_theme = theme_light if self.current_theme == theme_dark else theme_dark
+        # self.current_theme = theme_light if self.current_theme == theme_dark else theme_dark
         self.home_page.apply_theme(self.current_theme)
+
+
+        self.stack_widget.setStyleSheet(
+    f"background-color: {self.current_theme['secondary_bg']}; "
+    "border-radius: 5px;"
+)
+        
+        
         self.settings_page.apply_theme(self.current_theme)
         self.setStyleSheet(f"background-color: {self.current_theme['bg_color']};")
         if is_menubar:

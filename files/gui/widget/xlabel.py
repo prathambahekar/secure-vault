@@ -10,6 +10,7 @@ class xLabel(QLabel):
     def apply_theme(self):
         self.setStyleSheet(f"""
             QLabel {{
+                background : transparent;
                 font: bold {self.theme['font_size_title']} "{self.theme['font_family']}";
                 color: {self.theme['text_color']};
                 padding: 10px;
