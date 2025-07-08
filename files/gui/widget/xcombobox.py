@@ -17,12 +17,6 @@ class xComboBox(QComboBox):
                 color: {self.theme['text_color']};
                 min-height: 36px;
             }}
-            QComboBox:hover {{
-                background-color: {self.theme['hover_bg']};
-            }}
-            QComboBox:focus {{
-                background-color: {self.theme['hover_bg']};
-            }}
             QComboBox::drop-down {{
                 border: none;
                 width: 30px;
