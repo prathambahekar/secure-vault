@@ -31,11 +31,11 @@ STYLE_CONFIG_DARK = {
     "secondary_bg": "#252525",
     "def_bg": "#2c2c2c",
     "border_color": "#3a3a3a",
-    "accent_color": "#c8b7e1",
-    "accent_hover": "#b9a6d3",
-    "accent_pressed": "#a996c5",
+    "accent_color": "#f984a2",
+    "accent_hover": "#f984a2",
+    "accent_pressed": "#f984a2",
     "hover_bg": "#2d2d2d",
-    "selected_bg": "#b9a6d3",
+    "selected_bg": "#f984a2",
     "selected_text_color": "#1e1e1e"
 }
 
@@ -49,10 +49,10 @@ STYLE_CONFIG_LIGHT = {
     "secondary_bg": "#ffffff",
     "def_bg": "#ffffff",
     "border_color": "#d0d0d0",
-    "accent_color": "#185abd",
-    "accent_hover": "#185abd",
-    "accent_pressed": "#185abd",
+    "accent_color": "#f984a2",
+    "accent_hover": "#f984a2",
+    "accent_pressed": "#f984a2",
     "hover_bg": "#e8e8e8",
-    "selected_bg": "#185abd",
+    "selected_bg": "#f984a2",
     "selected_text_color": "white"
 }
